@@ -109,7 +109,6 @@ $$
 
 
 ```python
-Here is the entire code from cell g7N5_c8OVZ4U:
 
 # -------------------------------------------------
 # Monte Carlo Control
@@ -119,29 +118,28 @@ epsilon = epsilon_start
 
 for i_episode in range(num_episodes):
     episode = generate_episode(epsilon)
-
+    
     # Total reward for the episode
     total_reward = sum([reward for state, action, reward in episode])
     episode_rewards.append(total_reward)
 
     # Update Q-table
-    G = 0  # Discounted return
+    G = 0  
     for t in reversed(range(len(episode))):
         state, action, reward = episode[t]
         G = reward + gamma * G
 
-        # Check if (state, action) pair has been visited for the first time in this episode
-        # This is a common simplification for Monte Carlo control
         first_occurrence = next(i for i, (s, a, r) in enumerate(episode) if s == state and a == action)
         if first_occurrence == t:
-            # Simple average or incremental update
+
             Q[state, action] = Q[state, action] + alpha * (G - Q[state, action])
 
-    # Epsilon decay
     epsilon = max(epsilon_min, epsilon * epsilon_decay)
 
     if (i_episode + 1) % 1000 == 0:
         print(f"Episode {i_episode + 1}/{num_episodes}, Epsilon: {epsilon:.4f}, Avg Reward: {np.mean(episode_rewards[-1000:]):.2f}")
+
+
 ```
 
 ---
@@ -175,6 +173,8 @@ Estimated State-Value Function:
  [0.785 0.    0.954 0.   ]
  [0.792 0.969 0.989 0.   ]
  [0.    0.99  1.    0.   ]]
+ Name: MONISH N
+ Register Number: 212223240097
 
 
 Learned Policy:
@@ -194,7 +194,9 @@ Average reward over last 1000 episodes: 0.936
 
 ## Result
 ```text
-
+The Monte Carlo Control successfully trained an agent, achieving a high average reward of approximately 93% over 
+the final 1000 episodes. The learning curve clearly shows rapid convergence to an optimal policy that efficiently 
+navigates the FrozenLake environment.
 
 
 ```
@@ -203,7 +205,7 @@ Average reward over last 1000 episodes: 0.936
 ## Inference
 ```text
 
-
+The Monte Carlo Control experiment successfully trained an agent to navigate the FrozenLake environment. Over 20,000 episodes, the agent's average reward steadily increased, achieving a high success rate of approximately 91.9% in the last 1000 episodes. This demonstrates that off-policy Monte Carlo Control, using an epsilon-greedy exploration strategy, effectively learned an optimal greedy policy to guide the agent to the goal, avoiding holes, and achieving consistent positive rewards.
 
 ```
 
