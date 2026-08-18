@@ -100,42 +100,43 @@ $$
 
 ## Algorithm
 
-1. **Initialize Parameters & Q-Table:**
-   * Set up the environment (e.g., `FrozenLake-v1`).
-   * Initialize the Q-table $Q(s, a) = 0$ for all $s \in S, a \in A$.
-   * Define hyperparameters: learning rate $\alpha$, discount factor $\gamma$, initial exploration rate $\epsilon$, decay rate, and total episodes `num_episodes`.
+1. **Initialize the Environment and Parameters**
+   Set up the FrozenLake environment and create a Q-table filled with zeros for all states and actions.
+   Define the learning rate $\alpha$, discount factor $\gamma$, initial exploration rate $\epsilon$, decay rate, and total episodes.
+   
+---
+
+2. **Generate Episodes using Epsilon-Greedy**
+   Run the training loop for the defined number of episodes from start to finish.
+   Use the $\epsilon$-greedy policy to balance random exploration with greedy exploitation at each step.
+   Store the entire sequence of $(S_t, A_t, R_{t+1})$ transitions encountered in the episode.
 
 ---
 
-2. **Episode Loop:**
-   * For each episode $i = 1$ to `num_episodes`:
-     * Generate an entire episode trajectory using the $\epsilon$-greedy policy:
-       $$S_0, A_0, R_1, S_1, A_1, R_2, \dots, S_{T-1}, A_{T-1}, R_T$$
-     * Initialize cumulative return $G \leftarrow 0$.
+3. **Calculate Discounted Returns**
+   Set the return accumulator $G = 0$ after the episode terminates.
+   Iterate backwards through the trajectory from the final step to the start.
+   Compute the discounted return at each step using the update rule:
+   $$G \leftarrow R_{t+1} + \gamma G$$
 
 ---
 
-3. **Backward Return & Q-Value Update:**
-   * Iterate backwards through each time step $t = T-1, T-2, \dots, 0$:
-     * Compute the discounted return:
-       $$G \leftarrow R_{t+1} + \gamma G$$
-     * **First-Visit Check:** If the pair $(S_t, A_t)$ does not appear in $S_0, A_0, S_1, A_1, \dots, S_{t-1}, A_{t-1}$:
-       $$Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \big(G - Q(S_t, A_t)\big)$$
+4. **Update Q-Values with First-Visit Check**
+   Check if the current state-action pair $(S_t, A_t)$ occurred earlier in the episode.
+   If it is the first visit, update its action-value in the Q-table using:
+   $$Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \big(G - Q(S_t, A_t)\big)$$
 
 ---
 
-4. **Epsilon Decay:**
-   * Decay $\epsilon$ after each episode to gradually reduce exploration:
-     $$\epsilon \leftarrow \max(\epsilon_{min}, \epsilon \cdot \text{decay})$$
+5. **Decay Epsilon and Extract Optimal Policy**
+   Reduce $\epsilon$ after each episode until reaching $\epsilon_{min}$ to favor exploitation over time.
+   Extract the final optimal policy by picking the action with the highest Q-value:
+   $$\pi^*(s) = \arg\max_a Q(s, a)$$
+   Compute moving average rewards across sliding windows to confirm convergence.
 
 ---
 
-5. **Policy Extraction & Evaluation:**
-   * Derive the optimal deterministic greedy policy:
-     $$\pi^*(s) = \arg\max_a Q(s, a)$$
-   * Compute average rewards over sliding windows to monitor policy convergence.
 
----
 ## Python Program
 
 -------------------------------------------------
