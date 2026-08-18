@@ -109,10 +109,39 @@ $$
 
 
 ```python
-# Write your code here
+Here is the entire code from cell g7N5_c8OVZ4U:
 
+# -------------------------------------------------
+# Monte Carlo Control
+# -------------------------------------------------
 
+epsilon = epsilon_start
 
+for i_episode in range(num_episodes):
+    episode = generate_episode(epsilon)
+
+    # Total reward for the episode
+    total_reward = sum([reward for state, action, reward in episode])
+    episode_rewards.append(total_reward)
+
+    # Update Q-table
+    G = 0  # Discounted return
+    for t in reversed(range(len(episode))):
+        state, action, reward = episode[t]
+        G = reward + gamma * G
+
+        # Check if (state, action) pair has been visited for the first time in this episode
+        # This is a common simplification for Monte Carlo control
+        first_occurrence = next(i for i, (s, a, r) in enumerate(episode) if s == state and a == action)
+        if first_occurrence == t:
+            # Simple average or incremental update
+            Q[state, action] = Q[state, action] + alpha * (G - Q[state, action])
+
+    # Epsilon decay
+    epsilon = max(epsilon_min, epsilon * epsilon_decay)
+
+    if (i_episode + 1) % 1000 == 0:
+        print(f"Episode {i_episode + 1}/{num_episodes}, Epsilon: {epsilon:.4f}, Avg Reward: {np.mean(episode_rewards[-1000:]):.2f}")
 ```
 
 ---
@@ -120,25 +149,44 @@ $$
 ## Output
 
 ```text
-Final Q-table:
 
+
+Final Q-table:
+[[0.625 0.566 0.912 0.662]
+ [0.631 0.    0.922 0.691]
+ [0.765 0.932 0.74  0.754]
+ [0.752 0.    0.227 0.571]
+ [0.717 0.785 0.    0.736]
+ [0.    0.    0.    0.   ]
+ [0.    0.954 0.    0.771]
+ [0.    0.    0.    0.   ]
+ [0.688 0.    0.792 0.759]
+ [0.836 0.969 0.877 0.   ]
+ [0.946 0.989 0.    0.952]
+ [0.    0.    0.    0.   ]
+ [0.    0.    0.    0.   ]
+ [0.    0.927 0.99  0.918]
+ [0.973 0.99  1.    0.979]
+ [0.    0.    0.    0.   ]]
 
 
 Estimated State-Value Function:
-
-
-
-
-
+[[0.912 0.922 0.932 0.752]
+ [0.785 0.    0.954 0.   ]
+ [0.792 0.969 0.989 0.   ]
+ [0.    0.99  1.    0.   ]]
 
 
 Learned Policy:
+[['R' 'R' 'D' 'L']
+ ['D' 'L' 'D' 'L']
+ ['R' 'D' 'D' 'L']
+ ['L' 'R' 'R' 'L']]
 
 
+Average reward over last 1000 episodes: 0.936
 
 
-
-Average reward over last 1000 episodes: 
 ```
 
 
