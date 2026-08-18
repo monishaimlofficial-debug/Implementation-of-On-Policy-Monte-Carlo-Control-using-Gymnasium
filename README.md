@@ -98,7 +98,6 @@ $$
 
 ## Algorithm
 
-## Algorithm
 
 1. **Initialize the Environment and Parameters**
    Set up the FrozenLake environment and create a Q-table filled with zeros for all states and actions.
