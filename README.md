@@ -31,11 +31,9 @@ pip install gymnasium numpy matplotlib
 
 ## Environment Description
 
+Environment: FrozenLake-v1
 
-
-
-
-
+The project utilizes the FrozenLake-v1 environment from Gymnasium, a classic grid-world reinforcement learning problem. In this setup, the agent navigates a 4x4 grid. The objective is to move from a starting position ('S') to a goal ('G') while avoiding frozen holes ('H'). For simplicity and to focus on the core Monte Carlo Control algorithm, the is_slippery parameter is set to False, meaning the agent's actions deterministically move it in the chosen direction without random slips. This provides a clear, discrete state and action space suitable for demonstrating value-based learning methods.
 
 ## Theory
 
@@ -100,8 +98,44 @@ $$
 
 ## Algorithm
 
+## Algorithm
 
+1. **Initialize Parameters & Q-Table:**
+   * Set up the environment (e.g., `FrozenLake-v1`).
+   * Initialize the Q-table $Q(s, a) = 0$ for all $s \in S, a \in A$.
+   * Define hyperparameters: learning rate $\alpha$, discount factor $\gamma$, initial exploration rate $\epsilon$, decay rate, and total episodes `num_episodes`.
 
+---
+
+2. **Episode Loop:**
+   * For each episode $i = 1$ to `num_episodes`:
+     * Generate an entire episode trajectory using the $\epsilon$-greedy policy:
+       $$S_0, A_0, R_1, S_1, A_1, R_2, \dots, S_{T-1}, A_{T-1}, R_T$$
+     * Initialize cumulative return $G \leftarrow 0$.
+
+---
+
+3. **Backward Return & Q-Value Update:**
+   * Iterate backwards through each time step $t = T-1, T-2, \dots, 0$:
+     * Compute the discounted return:
+       $$G \leftarrow R_{t+1} + \gamma G$$
+     * **First-Visit Check:** If the pair $(S_t, A_t)$ does not appear in $S_0, A_0, S_1, A_1, \dots, S_{t-1}, A_{t-1}$:
+       $$Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \big(G - Q(S_t, A_t)\big)$$
+
+---
+
+4. **Epsilon Decay:**
+   * Decay $\epsilon$ after each episode to gradually reduce exploration:
+     $$\epsilon \leftarrow \max(\epsilon_{min}, \epsilon \cdot \text{decay})$$
+
+---
+
+5. **Policy Extraction & Evaluation:**
+   * Derive the optimal deterministic greedy policy:
+     $$\pi^*(s) = \arg\max_a Q(s, a)$$
+   * Compute average rewards over sliding windows to monitor policy convergence.
+
+---
 ## Python Program
 
 -------------------------------------------------
